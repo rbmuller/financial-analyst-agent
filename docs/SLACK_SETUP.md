@@ -1,26 +1,26 @@
-# Criando o app no Slack
+# Creating the Slack app
 
-O bot roda em Socket Mode: ele abre uma conexão de saída (WebSocket) com o Slack e recebe os eventos por ela. Não precisa de URL pública, e funciona na sua máquina.
+The bot runs in Socket Mode: it opens an outbound connection (a WebSocket) to Slack and receives events through it. It needs no public URL, and it works from your own machine.
 
-Você vai sair daqui com dois tokens no `.env`:
+You will finish with two tokens in `.env`:
 
-| Variável | Começa com | Para que serve |
+| Variable | Starts with | What it is for |
 |---|---|---|
-| `SLACK_APP_TOKEN` | `xapp-` | Abrir a conexão do Socket Mode |
-| `SLACK_BOT_TOKEN` | `xoxb-` | Ler menções e postar mensagens como o bot |
+| `SLACK_APP_TOKEN` | `xapp-` | Opening the Socket Mode connection |
+| `SLACK_BOT_TOKEN` | `xoxb-` | Reading mentions and posting messages as the bot |
 
-É preciso ter permissão para instalar apps no workspace.
+You need permission to install apps in the workspace.
 
-## 1. Criar o app a partir do manifesto
+## 1. Create the app from the manifest
 
-1. Abra <https://api.slack.com/apps> e clique em **Create New App** → **From a manifest**.
-2. Escolha o workspace da TBDC.
-3. Selecione a aba **YAML**, cole o manifesto abaixo e confirme.
+1. Open <https://api.slack.com/apps> and click **Create New App** → **From a manifest**.
+2. Choose your workspace.
+3. Select the **YAML** tab, paste the manifest below and confirm.
 
 ```yaml
 display_information:
   name: SEC Analyst
-  description: Responde perguntas sobre empresas listadas nos EUA a partir dos relatórios da SEC
+  description: Answers questions about US-listed companies from their SEC filings
 features:
   app_home:
     messages_tab_enabled: true
@@ -46,62 +46,64 @@ settings:
   token_rotation_enabled: false
 ```
 
-O manifesto já liga o Socket Mode, os scopes e os eventos. O que cada item faz:
+The manifest already turns on Socket Mode, the scopes and the events. What each item does:
 
-| Item | Tipo | Por quê |
+| Item | Type | Why |
 |---|---|---|
-| `app_mentions:read` | scope | Receber as mensagens em que o bot é mencionado |
-| `chat:write` | scope | Postar e editar as respostas |
-| `im:history` | scope | Ler mensagens diretas enviadas ao bot |
-| `app_mention` | evento | Dispara quando alguém escreve `@SEC Analyst` num canal |
-| `message.im` | evento | Dispara quando alguém manda mensagem direta ao bot |
+| `app_mentions:read` | scope | Receive the messages that mention the bot |
+| `chat:write` | scope | Post and edit replies |
+| `im:history` | scope | Read direct messages sent to the bot |
+| `app_mention` | event | Fires when someone writes `@SEC Analyst` in a channel |
+| `message.im` | event | Fires when someone sends the bot a direct message |
 
-O bot não lê o histórico dos canais: só recebe as mensagens que o mencionam e as mensagens diretas.
+The bot does not read channel history: it only receives messages that mention it, and direct messages.
 
-## 2. Gerar o token do Socket Mode (`xapp-`)
+## 2. Generate the Socket Mode token (`xapp-`)
 
-1. No menu lateral, abra **Basic Information**.
-2. Em **App-Level Tokens**, clique em **Generate Token and Scopes**.
-3. Dê um nome (por exemplo `socket`), adicione o scope `connections:write` e clique em **Generate**.
-4. Copie o token `xapp-...`.
+1. In the sidebar, open **Basic Information**.
+2. Under **App-Level Tokens**, click **Generate Token and Scopes**.
+3. Give it a name (for example `socket`), add the `connections:write` scope and click **Generate**.
+4. Copy the `xapp-...` token.
 
-## 3. Instalar no workspace e pegar o token do bot (`xoxb-`)
+## 3. Install to the workspace and get the bot token (`xoxb-`)
 
-1. No menu lateral, abra **Install App** e clique em **Install to Workspace**.
-2. Revise as permissões e autorize.
-3. Copie o **Bot User OAuth Token** (`xoxb-...`).
+1. In the sidebar, open **Install App** and click **Install to Workspace**.
+2. Review the permissions and authorize.
+3. Copy the **Bot User OAuth Token** (`xoxb-...`).
 
-## 4. Configurar o `.env`
+## 4. Configure `.env`
 
 ```
 SLACK_APP_TOKEN=xapp-...
 SLACK_BOT_TOKEN=xoxb-...
 ```
 
-Os tokens dão acesso ao workspace: ficam só no `.env`, que está fora do git. Se um deles vazar, revogue-o na mesma página em que foi gerado.
+The tokens grant access to the workspace: keep them only in `.env`, which is outside git. If one leaks, revoke it on the same page where it was generated.
 
-## 5. Rodar e testar
+## 5. Run and test
 
 ```bash
 make slack
 ```
 
-Espere a linha `Connected. Mention the bot in a channel or send it a direct message.` (o carregamento do modelo de embedding leva alguns segundos). Depois:
+Wait for the line `Connected. Mention the bot in a channel or send it a direct message.` (loading the embedding model takes a few seconds). Then:
 
-1. Num canal, convide o bot: `/invite @SEC Analyst`.
-2. Pergunte: `@SEC Analyst qual foi a receita da Apple no último ano fiscal?`
-3. O bot responde na thread com "Pensando…", atualiza o status enquanto trabalha e troca a mensagem pela resposta com as fontes.
-4. Na mesma thread, faça uma continuação: `@SEC Analyst e a da Microsoft?`
-5. Teste também uma mensagem direta ao bot, sem menção.
+1. In a channel, invite the bot: `/invite @SEC Analyst`.
+2. Ask: `@SEC Analyst what was Apple's revenue in the last fiscal year?`
+3. The bot replies in the thread with a "thinking" message, updates the status while it works, and replaces the message with the answer and its sources.
+4. In the same thread, ask a follow-up: `@SEC Analyst and Microsoft's?` In a channel the bot only sees messages that mention it, so the follow-up needs the mention too.
+5. Also try a direct message to the bot, with no mention.
 
-Pare o bot com `Ctrl+C`. Ele só responde enquanto o `make slack` estiver rodando.
+Stop the bot with `Ctrl+C`. It only answers while `make slack` is running.
 
-## Problemas comuns
+The bot replies in the language of the question. Its fixed status and error messages ("Pensando…", "Fontes") are in Portuguese; they are constants in `slack_app/formatting.py`.
 
-| Sintoma | Causa provável |
+## Common problems
+
+| Symptom | Likely cause |
 |---|---|
-| `SLACK_BOT_TOKEN and SLACK_APP_TOKEN must be set` | Faltam os tokens no `.env` |
-| `invalid_auth` ao iniciar | Token trocado de lugar (`xapp-` no lugar do `xoxb-`) ou revogado |
-| Bot não reage à menção no canal | Bot não foi convidado para o canal |
-| Mensagem direta não funciona | Em **App Home**, a aba **Messages** precisa estar habilitada; reinstale o app se mudou scopes |
-| `missing_scope` nos logs | O app foi alterado depois de instalado: reinstale em **Install App** |
+| `SLACK_BOT_TOKEN and SLACK_APP_TOKEN must be set` | The tokens are missing from `.env` |
+| `invalid_auth` on startup | The tokens are swapped (`xapp-` in place of `xoxb-`) or revoked |
+| The bot does not react to a mention in a channel | The bot was not invited to the channel |
+| Direct messages do not work | In **App Home**, the **Messages** tab must be enabled; reinstall the app if scopes changed |
+| `missing_scope` in the logs | The app was changed after installation: reinstall under **Install App** |

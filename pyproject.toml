@@ -3,6 +3,7 @@ name = "sec-analyst-agent"
 version = "0.1.0"
 description = "Slack agent that answers questions about US-listed companies from SEC filings, with citations."
 requires-python = ">=3.12,<3.13"
+license = "MIT"
 dependencies = [
     "anthropic>=2.14.0",
     "beautifulsoup4>=4.15.0",

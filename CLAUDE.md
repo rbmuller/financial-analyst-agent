@@ -16,7 +16,7 @@ Python 3.12 (uv, ruff, mypy strict, pytest), Postgres 16 + pgvector, Docker Comp
 - `slack_app/`: bot em Socket Mode. `main.py` só liga os eventos do Bolt; a lógica fica em `handler.py` (testável sem Slack), `formatting.py` (Markdown → blocos do Slack) e `history.py` (contexto da thread, lido de `agent_runs`).
 - `evals/`: `dataset.yaml` (casos e gabaritos), eval de recuperação (sem LLM), eval de resposta (agente + juiz LLM) e `run.py`. Resultados vão para `data/evals/` (fora do git).
 - `config/`: configuração versionada sem segredos (empresas e mapa métrica → tags XBRL).
-- `docs/`: specs, design e `CONCEITOS.md` (pt-BR). O `README.md` é em inglês.
+- `docs/`: specs e design (pt-BR, internos); `CONCEPTS.md` e `SLACK_SETUP.md` em inglês, como o `README.md`, por serem a vitrine pública do repositório.
 
 ## Padrões
 

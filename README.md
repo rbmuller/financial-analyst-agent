@@ -4,7 +4,7 @@ A Slack bot that answers questions about US-listed companies from their SEC fili
 
 Ask it *"Why did Nike's gross margin fall over the last three quarters, and what did management say about it?"* and it pulls the reported figures from XBRL data, computes the margins, finds management's explanation in the 10-Q, and replies in the thread with the filings it used. If the filings do not contain the answer, it says so.
 
-It is a learning project and a portfolio piece: retrieval-augmented generation, hybrid search, a tool-using agent and evals, built from first principles on Postgres, without an agent framework.
+It is a learning project and a portfolio piece: retrieval-augmented generation, hybrid search, a tool-using agent and evals, built from first principles on Postgres, without an agent framework. The concepts behind each part are explained in [docs/CONCEPTS.md](docs/CONCEPTS.md).
 
 ## What a question looks like
 
@@ -116,7 +116,7 @@ sequenceDiagram
 
 **Interface.** A Slack Bolt app in Socket Mode: replies in a thread, shows what the agent is doing while it works, and keeps follow-up questions in context.
 
-`docs/CONCEITOS.md` (in Portuguese) explains each concept with examples from this codebase.
+New to RAG or agents? [docs/CONCEPTS.md](docs/CONCEPTS.md) explains each concept used here (embeddings, vector databases, HNSW, chunking, hybrid search, re-ranking, LLMs, RAG, tool use, agents, guardrails, evals) with examples from this codebase.
 
 ## Quickstart
 
@@ -265,6 +265,10 @@ slack_app/   Socket Mode bot, Block Kit formatting, thread history
 evals/       dataset, retrieval eval, answer eval with an LLM judge
 db/          SQL migrations and the migration runner
 config/      companies, metric definitions, model prices
-docs/        concepts (pt-BR), Slack setup guide, spec
+docs/        concepts guide, Slack setup guide, spec
 tests/       unit and integration tests
 ```
+
+## License
+
+[MIT](LICENSE)

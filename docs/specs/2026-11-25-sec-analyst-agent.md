@@ -53,6 +53,6 @@ O `User-Agent` com contato, exigido pela SEC, vem do `.env`, e o cliente HTTP re
 3. RAG: chunking, embeddings, busca híbrida, CLI de busca.
 4. Agente: loop, tools, citações, tracing, CLI.
 5. Slack: bot e guia de criação do app.
-6. Evals, README final, diagramas, `docs/CONCEITOS.md` consolidado.
+6. Evals, README final, diagramas, `docs/CONCEPTS.md` consolidado.
 
 Cada fase termina com instruções de teste e espera confirmação antes da seguinte.
