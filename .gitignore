@@ -1,0 +1,22 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local data and model caches
+data/
+.cache/
+
+# Temporary Claude outputs
+docs/claude/tmp/
+scripts/claude/tmp/
+
+.DS_Store

@@ -1,0 +1,247 @@
+# Eval cases. Every expected value below was read from the ingested SEC data
+# (financial_metrics for numbers, indexed filing passages for text), not written
+# from memory. Re-derive them if the covered companies or periods change.
+#
+# kind:
+#   numeric       answered from XBRL figures (query_financials)
+#   narrative     answered from filing text (search_filings)
+#   mixed         needs both
+#   unanswerable  the data does not contain the answer; the agent must say so
+#
+# expected_facts: what a correct answer states. The judge checks each one.
+# retrieval:      only for cases answered from text. A retrieved passage counts as
+#                 relevant when it belongs to `ticker` (and `form` / `fiscal_year` /
+#                 `fiscal_period` when given) and contains any of `phrases`.
+#                 `query` and `filters` are what a careful analyst would search for.
+cases:
+  # ---------------------------------------------------------------- numeric
+  - id: num-aapl-revenue-fy26
+    kind: numeric
+    question: Qual foi a receita da Apple no ano fiscal de 2026?
+    expected_facts:
+      - Apple's fiscal 2026 revenue (net sales) was about $478.8 billion ($478,834 million).
+
+  - id: num-msft-net-income-fy26
+    kind: numeric
+    question: What was Microsoft's net income in fiscal year 2026?
+    expected_facts:
+      - Microsoft's fiscal 2026 net income was about $133.7 billion ($133,749 million).
+
+  - id: num-ko-gross-margin-2025
+    kind: numeric
+    question: Qual foi a margem bruta da Coca-Cola em 2025?
+    expected_facts:
+      - Coca-Cola's 2025 gross margin was about 61.6% (gross profit $29,544 million on revenue $47,941 million).
+
+  - id: num-tsla-revenue-change-2025
+    kind: numeric
+    question: How much did Tesla's annual revenue change from 2024 to 2025?
+    expected_facts:
+      - Tesla's revenue fell from about $97.7 billion in 2024 to about $94.8 billion in 2025.
+      - The change was a decline of about 2.9%.
+
+  - id: num-ko-net-income-cagr
+    kind: numeric
+    question: Qual o CAGR do lucro líquido da Coca-Cola entre 2020 e 2025?
+    expected_facts:
+      - Coca-Cola's net income grew from about $7.7 billion in 2020 to about $13.1 billion in 2025.
+      - The compound annual growth rate over those 5 years was about 11.1%.
+
+  - id: num-aapl-vs-msft-revenue-fy26
+    kind: numeric
+    question: Compare a receita da Apple e da Microsoft no ano fiscal de 2026.
+    expected_facts:
+      - Apple's fiscal 2026 revenue was about $478.8 billion.
+      - Microsoft's fiscal 2026 revenue was about $331.8 billion.
+
+  - id: num-aapl-eps-fy26
+    kind: numeric
+    question: What was Apple's diluted EPS in fiscal 2026, and how much did it grow versus fiscal 2025?
+    expected_facts:
+      - Apple's fiscal 2026 diluted EPS was $8.98.
+      - It grew about 20.4% from $7.46 in fiscal 2025.
+
+  - id: num-tsla-revenue-q3-2026
+    kind: numeric
+    question: Qual foi a receita da Tesla no terceiro trimestre de 2026?
+    expected_facts:
+      - Tesla's revenue in the third quarter of 2026 was about $28.0 billion ($28,046 million).
+
+  # -------------------------------------------------------------- narrative
+  - id: txt-nke-gross-margin-q3-fy26
+    kind: narrative
+    question: Why did Nike's gross margin decline in the third quarter of fiscal 2026?
+    expected_facts:
+      - Consolidated gross margin was about 130 basis points lower than the prior year.
+      - The main cause was higher NIKE Brand product costs, primarily from higher tariffs in North America (about 270 basis points).
+    retrieval:
+      query: reasons consolidated gross margin lower than prior year third quarter
+      filters: {tickers: [NKE], fiscal_years: [2026]}
+      ticker: NKE
+      form: 10-Q
+      fiscal_year: 2026
+      fiscal_period: Q3
+      phrases:
+        - 130 basis points lower
+        - decreasing gross margin approximately 270 basis points
+
+  - id: txt-nke-endorsement-obligations
+    kind: narrative
+    question: Quanto a Nike tem em obrigações de contratos de patrocínio (endorsement contracts)?
+    expected_facts:
+      - As of May 31, 2026, Nike had endorsement contract obligations of approximately $15.5 billion.
+      - Approximately $1.7 billion of that is payable within 12 months.
+    retrieval:
+      query: endorsement contract obligations total amount
+      filters: {tickers: [NKE]}
+      ticker: NKE
+      form: 10-K
+      fiscal_year: 2026
+      phrases:
+        - endorsement contract obligations, including associated marketing commitments, of approximately $15.5 billion
+
+  - id: txt-aapl-services-q3-fy26
+    kind: narrative
+    question: What drove the growth in Apple's Services net sales in the third quarter of fiscal 2026?
+    expected_facts:
+      - Services net sales increased primarily due to higher net sales from advertising and cloud services.
+    retrieval:
+      query: Services net sales increased primarily due to
+      filters: {tickers: [AAPL], fiscal_years: [2026]}
+      ticker: AAPL
+      form: 10-Q
+      fiscal_year: 2026
+      fiscal_period: Q3
+      phrases:
+        - higher net sales from advertising and cloud services
+
+  - id: txt-aapl-tariff-refund
+    kind: narrative
+    question: O que a Apple diz sobre reembolso de tarifas depois da decisão da Suprema Corte?
+    expected_facts:
+      - In February 2026 the U.S. Supreme Court struck down certain tariffs imposed under the International Emergency Economic Powers Act (IEEPA).
+      - Apple is applying for a refund of tariffs paid, following U.S. Customs and Border Protection processes.
+    retrieval:
+      query: Supreme Court ruling tariffs refund
+      filters: {tickers: [AAPL]}
+      ticker: AAPL
+      phrases:
+        - applying for a refund of tariffs paid
+
+  - id: txt-ko-currency-operating-income
+    kind: narrative
+    question: Como as variações cambiais afetaram o lucro operacional da Coca-Cola em 2025?
+    expected_facts:
+      - Foreign currency exchange rate fluctuations unfavorably impacted consolidated operating income by 12% in 2025.
+      - The cause was a stronger U.S. dollar against currencies including the Mexican peso, Argentine peso, Brazilian real and Turkish lira.
+    retrieval:
+      query: foreign currency exchange rates impact on consolidated operating income
+      filters: {tickers: [KO], fiscal_years: [2025]}
+      ticker: KO
+      form: 10-K
+      fiscal_year: 2025
+      phrases:
+        - unfavorably impacted consolidated operating income by 12%
+
+  - id: txt-ko-philippines-refranchising
+    kind: narrative
+    question: What gain did Coca-Cola recognize from refranchising its bottling operations in the Philippines?
+    expected_facts:
+      - Coca-Cola recognized a gain of $595 million in 2024 related to the refranchising of its bottling operations in the Philippines.
+    retrieval:
+      query: gain refranchising bottling operations Philippines
+      filters: {tickers: [KO]}
+      ticker: KO
+      phrases:
+        - gain of $595 million related to the refranchising of our bottling operations in the Philippines
+
+  - id: txt-msft-openai-stake
+    kind: narrative
+    # The stake changes between reports (25% in the FY2026 10-K, 24% one quarter
+    # later), so the question pins the date. An undated version of this question
+    # was graded wrong when the agent correctly answered with the newer figure.
+    question: Qual era a participação da Microsoft na OpenAI no fim do ano fiscal de 2026 (30/06/2026) e como ela é contabilizada?
+    expected_facts:
+      - As of June 30, 2026, Microsoft's investment represented an approximate 25% interest in OpenAI on an as-converted basis.
+      - The investment is accounted for under the equity method.
+    retrieval:
+      query: OpenAI investment interest equity method
+      filters: {tickers: [MSFT]}
+      ticker: MSFT
+      form: 10-K
+      fiscal_year: 2026
+      phrases:
+        - approximate 25% interest on an as-converted basis
+
+  - id: txt-ko-unit-case-volume-2025
+    kind: narrative
+    question: How did Coca-Cola's unit case volume change in 2025, worldwide and by region?
+    expected_facts:
+      - Worldwide unit case volume was even (0% change) in 2025 versus 2024.
+      - EMEA grew 3% and North America declined 1%, while Latin America and Asia Pacific were even.
+    retrieval:
+      query: unit case volume growth worldwide and by operating segment 2025 versus 2024
+      filters: {tickers: [KO], fiscal_years: [2025]}
+      ticker: KO
+      form: 10-K
+      fiscal_year: 2025
+      phrases:
+        - Information about our volume growth worldwide and by operating segment is as follows
+
+  - id: txt-tsla-automotive-margin-q2-2026
+    kind: narrative
+    question: What happened to Tesla's total automotive gross margin in the second quarter of 2026?
+    expected_facts:
+      - Gross margin for total automotive decreased from 17.2% to 16.9% in the three months ended June 30, 2026 compared with the same period of 2025.
+    retrieval:
+      query: gross margin for total automotive three months ended June 30 2026
+      filters: {tickers: [TSLA], fiscal_years: [2026]}
+      ticker: TSLA
+      form: 10-Q
+      fiscal_year: 2026
+      fiscal_period: Q2
+      phrases:
+        - Gross margin for total automotive decreased from 17.2% to 16.9%
+
+  # ------------------------------------------------------------------ mixed
+  - id: mix-nke-gross-margin-q2-fy26
+    kind: mixed
+    question: Qual foi a margem bruta da Nike no segundo trimestre fiscal de 2026 e como a administração explicou a variação?
+    expected_facts:
+      - Nike's gross margin in the second quarter of fiscal 2026 was about 40.6%.
+      - It was about 300 basis points lower than the 43.6% of the prior-year quarter.
+      - Management attributed it primarily to higher NIKE Brand product costs from higher tariffs in North America.
+    retrieval:
+      query: second quarter fiscal 2026 consolidated gross margin lower than prior year primarily due to
+      filters: {tickers: [NKE], fiscal_years: [2026]}
+      ticker: NKE
+      form: 10-Q
+      fiscal_year: 2026
+      fiscal_period: Q2
+      phrases:
+        - Consolidated gross margin was 300 basis points lower than the prior year
+
+  # ----------------------------------------------------------- unanswerable
+  - id: una-amazon-revenue
+    kind: unanswerable
+    question: Qual foi a receita da Amazon em 2025?
+    expected_facts:
+      - Amazon is not among the covered companies, so the figure is not available.
+
+  - id: una-aapl-revenue-2005
+    kind: unanswerable
+    question: What was Apple's revenue in fiscal year 2005?
+    expected_facts:
+      - The available data does not go back to fiscal 2005, so the figure is not available.
+
+  - id: una-tsla-stock-price
+    kind: unanswerable
+    question: What is Tesla's stock price today?
+    expected_facts:
+      - Current stock prices are not in the available SEC filings data.
+
+  - id: una-nke-brazil-sponsorship
+    kind: unanswerable
+    question: Quanto a Nike paga à seleção brasileira de futebol pelo patrocínio?
+    expected_facts:
+      - Nike's filings do not disclose the amount of individual endorsement contracts, so this specific figure is not available.

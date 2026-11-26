@@ -1,0 +1,49 @@
+# Curated metrics built from raw XBRL facts (table `financial_metrics`).
+#
+# Companies tag the same line item differently, and change tags over time, so
+# each metric lists candidate us-gaap concepts in priority order: for a given
+# fiscal period the first concept that has a value wins.
+#
+# additive: true  -> a missing Q4 can be derived as FY - (Q1 + Q2 + Q3).
+# additive: false -> never derived (per-share values do not add up).
+metrics:
+  - name: revenue
+    unit: USD
+    additive: true
+    concepts:
+      - RevenueFromContractWithCustomerExcludingAssessedTax
+      - Revenues
+      - SalesRevenueNet
+      - SalesRevenueGoodsNet
+
+  - name: cost_of_revenue
+    unit: USD
+    additive: true
+    concepts:
+      - CostOfRevenue
+      - CostOfGoodsAndServicesSold
+      - CostOfGoodsSold
+
+  - name: gross_profit
+    unit: USD
+    additive: true
+    concepts:
+      - GrossProfit
+
+  - name: operating_income
+    unit: USD
+    additive: true
+    concepts:
+      - OperatingIncomeLoss
+
+  - name: net_income
+    unit: USD
+    additive: true
+    concepts:
+      - NetIncomeLoss
+
+  - name: eps_diluted
+    unit: USD/shares
+    additive: false
+    concepts:
+      - EarningsPerShareDiluted

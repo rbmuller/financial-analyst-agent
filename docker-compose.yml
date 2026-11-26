@@ -1,0 +1,42 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      # Bound to loopback only: the database is never exposed to the network.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # One-off runner for migrations, ingestion, CLIs and tests
+  # (`docker compose run --rm app ...`). Not started by `docker compose up`.
+  app:
+    build: .
+    profiles: ["tools"]
+    env_file: .env
+    environment:
+      # Inside the compose network the database is reachable by service name.
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      # Downloaded models are kept in a volume, so they are fetched only once.
+      HF_HOME: /opt/hf-cache
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      TRANSFORMERS_VERBOSITY: error
+    volumes:
+      - .:/app
+      - hf_cache:/opt/hf-cache
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  hf_cache:

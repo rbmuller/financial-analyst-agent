@@ -1,0 +1,14 @@
+# Anthropic API prices in USD per million tokens, used to estimate the cost of
+# each agent run. Source: Anthropic's published pricing as of 2026-11-03.
+# Check https://platform.claude.com/docs/en/about-claude/pricing before trusting
+# these for anything other than a development estimate.
+cache_write_multiplier: 1.25   # cache writes are billed at 1.25x the input price
+models:
+  claude-opus-5-5:
+    input: 4.00
+    output: 20.00
+    cache_read: 0.20
+  claude-sonnet-5-5:
+    input: 2.00
+    output: 10.00
+    cache_read: 0.10

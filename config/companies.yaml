@@ -1,0 +1,9 @@
+# Companies covered by the agent. Add a ticker and run `make ingest`.
+# CIKs are not listed here: ingestion resolves them from the SEC's official
+# ticker map and stores them in the `companies` table.
+tickers:
+  - NKE
+  - AAPL
+  - MSFT
+  - KO
+  - TSLA
